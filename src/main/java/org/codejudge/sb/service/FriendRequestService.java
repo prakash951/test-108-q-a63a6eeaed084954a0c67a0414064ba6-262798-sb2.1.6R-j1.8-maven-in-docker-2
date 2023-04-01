@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import org.codejudge.sb.dto.FriendRequestResponse;
+import org.codejudge.sb.dto.FriendRequestsResponse;
 import org.codejudge.sb.dto.IUserResponse;
 import org.codejudge.sb.repository.FriendRepository;
 import org.codejudge.sb.repository.FriendRequestRepository;
@@ -64,20 +65,20 @@ public class FriendRequestService {
         return Optional.of(FriendRequestResponse.builder().status("success").build());
     }
 
-    public List<String> getFriendRequestForUser(String user) {
+    public Optional<FriendRequestsResponse> getFriendRequestForUser(String user) {
         List<User> users = myUserRepository.findByUsername(user);
         if (users == null || users.size() == 0) {
             throw new UserNotFoundException("User doesn't exists");
         }
         Long uid = users.get(0).getId();
-        List<FriendRequest> requests = myFriendRequestRepository.findByReceiverAndcompleted(uid, false);
+        List<FriendRequest> requests = myFriendRequestRepository.findByReceiverAndCompleted(uid, false);
         if (requests == null || requests.size() == 0) {
             throw new NoFriendRequestsPendingException("No pending friend requests");
         }
         List<Long> ids = requests.stream().map(request -> request.getRequestor()).collect(Collectors.toList());
         List<String> pendingRequests = new ArrayList<>();
         myUserRepository.findAllById(ids).forEach(record -> pendingRequests.add(record.getUsername()));
-        return pendingRequests;
+        return Optional.of(FriendRequestsResponse.builder().friend_requests(pendingRequests).build());
     }
 
 }

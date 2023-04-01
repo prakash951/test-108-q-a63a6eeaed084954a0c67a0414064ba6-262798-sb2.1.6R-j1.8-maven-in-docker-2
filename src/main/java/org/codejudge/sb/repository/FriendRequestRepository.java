@@ -8,5 +8,5 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
 
     List<FriendRequest> findByRequestorAndReceiver(Long requestor,Long receiver);
 
-    List<FriendRequest> findByReceiverAndcompleted(Long receiver,boolean completed);
+    List<FriendRequest> findByReceiverAndCompleted(Long receiver,boolean completed);
 }

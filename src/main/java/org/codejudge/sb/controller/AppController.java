@@ -67,7 +67,7 @@ public class AppController {
     @ApiOperation("This is the hello world api")
     @GetMapping("/friendRequests/{user}")
     public ResponseEntity<?> getFriendRequestForUser(@PathVariable(name="user") String user) {
-        return new ResponseEntity<>(myFriendRequestService.getFriendRequestForUser(user),HttpStatus.OK);
+        return new ResponseEntity<>(myFriendRequestService.getFriendRequestForUser(user).get(),HttpStatus.OK);
     }
 
 }
