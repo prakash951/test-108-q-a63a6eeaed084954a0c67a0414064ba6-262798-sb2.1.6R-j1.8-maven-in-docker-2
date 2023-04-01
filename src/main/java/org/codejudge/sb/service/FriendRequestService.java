@@ -38,10 +38,10 @@ public class FriendRequestService {
         if (users == null || users.size() < 2) {
             return Optional.empty();
         }
-        Long myId1 = users.get(0).getId();
-        Long myId2 = users.get(1).getId();
+        Long myId1 = users.get(0).getUsername().equals(uid1)?users.get(0).getId():users.get(1).getId();
+        Long myId2 = users.get(0).getUsername().equals(uid2)?users.get(0).getId():users.get(1).getId();
         List<FriendRequest> requests = myFriendRequestRepository.findByRequestorAndReceiver(myId1, myId2);
-        if (requests != null && requests.size() > 1) {
+        if (requests != null && requests.size() > 0) {
             return Optional.empty();
         }
         FriendRequest request = FriendRequest.builder().requestor(myId1).receiver(myId2).completed(false).build();
