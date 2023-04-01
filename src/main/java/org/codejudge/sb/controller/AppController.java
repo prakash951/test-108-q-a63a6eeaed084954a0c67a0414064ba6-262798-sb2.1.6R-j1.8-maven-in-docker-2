@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +46,16 @@ public class AppController {
         }
         return new ResponseEntity<>(ErrorUserResponse.builder().status("failure").reason("User Already Exists").build(),
                 HttpStatus.BAD_REQUEST);
+    }
+
+    @ApiOperation("This api is used to create the user")
+    @PostMapping("/add/{usera}/{userb}")
+    public ResponseEntity<IUserResponse> sendFriendRequest(@PathVariable(name = "usera") String usera,
+            @PathVariable(name = "userb") String userb) {
+        log.info("Request received for friend request");
+
+        return new ResponseEntity<>(ErrorUserResponse.builder().status("failure").reason("User Already Exists").build(),
+                HttpStatus.OK);
     }
 
 }
