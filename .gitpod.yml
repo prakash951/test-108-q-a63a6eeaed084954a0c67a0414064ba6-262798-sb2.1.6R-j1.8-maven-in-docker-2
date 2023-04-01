@@ -1,0 +1,15 @@
+tasks:
+  - before: |
+      wget -qOdatabase-setup.sh https://codejudge-starter-repo-artifacts.s3.ap-south-1.amazonaws.com/backend-project/gitpod/java/db-gitpod-setup.sh
+      chmod 0755 database-setup.sh
+      bash database-setup.sh
+    init: mvn clean install
+    command: java -jar ./target/spring-boot-in-docker.jar
+ports:
+  - port: 8080
+    onOpen: open-preview
+    visibility: public
+vscode:
+  extensions:
+    - vscjava.vscode-java-pack
+    - gabrielbb.vscode-lombok
