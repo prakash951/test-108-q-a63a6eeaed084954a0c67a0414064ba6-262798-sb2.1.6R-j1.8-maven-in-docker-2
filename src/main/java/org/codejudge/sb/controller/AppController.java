@@ -10,7 +10,7 @@ import javax.validation.Valid;
 import org.codejudge.sb.dto.ErrorUserResponse;
 import org.codejudge.sb.dto.IUserResponse;
 import org.codejudge.sb.dto.UserRequest;
-import org.codejudge.sb.dto.UserResponse;
+import org.codejudge.sb.service.FriendRequestService;
 import org.codejudge.sb.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +29,9 @@ public class AppController {
 
     @Autowired
     UserService myUserService;
+
+    @Autowired
+    FriendRequestService myFriendRequestService;
 
     @ApiOperation("This is the hello world api")
     @GetMapping("/")
@@ -53,9 +56,12 @@ public class AppController {
     public ResponseEntity<IUserResponse> sendFriendRequest(@PathVariable(name = "usera") String usera,
             @PathVariable(name = "userb") String userb) {
         log.info("Request received for friend request");
-
-        return new ResponseEntity<>(ErrorUserResponse.builder().status("failure").reason("User Already Exists").build(),
-                HttpStatus.OK);
+        Optional<IUserResponse> response = myFriendRequestService.createFriendRequest(usera, userb);
+        if (response.isPresent())
+            return new ResponseEntity<>(response.get(),
+                    HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(ErrorUserResponse.builder().status("failure").reason("User Request Invalid").build(),
+                HttpStatus.BAD_REQUEST);
     }
 
 }
