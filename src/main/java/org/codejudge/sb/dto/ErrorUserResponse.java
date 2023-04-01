@@ -8,5 +8,5 @@ import lombok.Data;
 public class ErrorUserResponse implements IUserResponse
 {
     String reason;
-    String message;
+    String status;
 }

@@ -37,16 +37,14 @@ public class AppController {
 
     @ApiOperation("This api is used to create the user")
     @PostMapping("/create")
-    public ResponseEntity<IUserResponse> createUser(@Valid @RequestBody UserRequest myUserRequest)
-    {
+    public ResponseEntity<IUserResponse> createUser(@Valid @RequestBody UserRequest myUserRequest) {
         log.info("Request received for create user");
         Optional<IUserResponse> response = myUserService.createUser(myUserRequest);
-        if(response.isPresent())
-        {
-            return new ResponseEntity<>(response.get(),HttpStatus.CREATED);
+        if (response.isPresent()) {
+            return new ResponseEntity<>(response.get(), HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(ErrorUserResponse.builder().message("User already Exists").reason("User Already Exists").build(),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ErrorUserResponse.builder().status("failure").reason("User Already Exists").build(),
+                HttpStatus.BAD_REQUEST);
     }
-
 
 }

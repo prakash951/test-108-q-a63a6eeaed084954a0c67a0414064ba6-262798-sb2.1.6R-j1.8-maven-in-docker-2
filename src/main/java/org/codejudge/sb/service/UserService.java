@@ -23,7 +23,7 @@ public class UserService {
     public Optional<IUserResponse> createUser(UserRequest myRequest)
     {
         log.info("Inside create user");
-        List<User> users = mRepository.findByUserName(myRequest.getUsername());
+        List<User> users = mRepository.findByUsername(myRequest.getUsername());
         if(users!=null && users.size()>0)
         {
             log.info("User Exists");
