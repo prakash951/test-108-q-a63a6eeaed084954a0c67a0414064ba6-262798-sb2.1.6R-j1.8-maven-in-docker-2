@@ -3,6 +3,7 @@ package org.codejudge.sb.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -14,6 +15,8 @@ import org.codejudge.sb.repository.UserRepository;
 import org.codejudge.sb.entity.Friend;
 import org.codejudge.sb.entity.FriendRequest;
 import org.codejudge.sb.entity.User;
+import org.codejudge.sb.exception.NoFriendRequestsPendingException;
+import org.codejudge.sb.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +41,8 @@ public class FriendRequestService {
         if (users == null || users.size() < 2) {
             return Optional.empty();
         }
-        Long myId1 = users.get(0).getUsername().equals(uid1)?users.get(0).getId():users.get(1).getId();
-        Long myId2 = users.get(0).getUsername().equals(uid2)?users.get(0).getId():users.get(1).getId();
+        Long myId1 = users.get(0).getUsername().equals(uid1) ? users.get(0).getId() : users.get(1).getId();
+        Long myId2 = users.get(0).getUsername().equals(uid2) ? users.get(0).getId() : users.get(1).getId();
         List<FriendRequest> requests = myFriendRequestRepository.findByRequestorAndReceiver(myId1, myId2);
         if (requests != null && requests.size() > 0) {
             return Optional.empty();
@@ -59,6 +62,22 @@ public class FriendRequestService {
         }
 
         return Optional.of(FriendRequestResponse.builder().status("success").build());
+    }
+
+    public List<String> getFriendRequestForUser(String user) {
+        List<User> users = myUserRepository.findByUsername(user);
+        if (users == null || users.size() == 0) {
+            throw new UserNotFoundException("User doesn't exists");
+        }
+        Long uid = users.get(0).getId();
+        List<FriendRequest> requests = myFriendRequestRepository.findByReceiverAndcompleted(uid, false);
+        if (requests == null || requests.size() == 0) {
+            throw new NoFriendRequestsPendingException("No pending friend requests");
+        }
+        List<Long> ids = requests.stream().map(request -> request.getRequestor()).collect(Collectors.toList());
+        List<String> pendingRequests = new ArrayList<>();
+        myUserRepository.findAllById(ids).forEach(record -> pendingRequests.add(record.getUsername()));
+        return pendingRequests;
     }
 
 }

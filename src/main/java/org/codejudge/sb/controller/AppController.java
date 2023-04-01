@@ -64,4 +64,10 @@ public class AppController {
                 HttpStatus.BAD_REQUEST);
     }
 
+    @ApiOperation("This is the hello world api")
+    @GetMapping("/friendRequests/{user}")
+    public ResponseEntity<?> getFriendRequestForUser(@PathVariable(name="user") String user) {
+        return new ResponseEntity<>(myFriendRequestService.getFriendRequestForUser(user),HttpStatus.OK);
+    }
+
 }
