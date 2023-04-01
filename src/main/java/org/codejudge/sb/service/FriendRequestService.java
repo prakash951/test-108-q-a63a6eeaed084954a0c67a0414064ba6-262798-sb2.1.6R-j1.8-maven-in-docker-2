@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 
 import org.codejudge.sb.dto.FriendRequestResponse;
 import org.codejudge.sb.dto.FriendRequestsResponse;
+import org.codejudge.sb.dto.FriendResponse;
 import org.codejudge.sb.dto.IUserResponse;
 import org.codejudge.sb.repository.FriendRepository;
 import org.codejudge.sb.repository.FriendRequestRepository;
@@ -63,6 +64,22 @@ public class FriendRequestService {
         }
 
         return Optional.of(FriendRequestResponse.builder().status("success").build());
+    }
+
+    public Optional<FriendResponse> getFriendsForUser(String user) {
+        List<User> users = myUserRepository.findByUsername(user);
+        if (users == null || users.size() == 0) {
+            throw new UserNotFoundException("User doesn't exists");
+        }
+        Long uid = users.get(0).getId();
+        List<Friend> requests = myFriendRepository.findByUserid(uid);
+        if (requests == null || requests.size() == 0) {
+            throw new NoFriendRequestsPendingException("No pending friend requests");
+        }
+        List<Long> ids = requests.stream().map(request -> request.getFirendid()).collect(Collectors.toList());
+        List<String> friends = new ArrayList<>();
+        myUserRepository.findAllById(ids).forEach(record -> friends.add(record.getUsername()));
+        return Optional.of(FriendResponse.builder().friends(friends).build());
     }
 
     public Optional<FriendRequestsResponse> getFriendRequestForUser(String user) {
