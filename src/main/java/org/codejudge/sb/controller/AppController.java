@@ -76,4 +76,10 @@ public class AppController {
         return new ResponseEntity<>(myFriendRequestService.getFriendsForUser(user).get(),HttpStatus.OK);
     }
 
+    @ApiOperation("This is the hello world api")
+    @GetMapping("/suggestions/{user}")
+    public ResponseEntity<?> getFriendSuggestions(@PathVariable(name="user") String user) {
+        return new ResponseEntity<>(myFriendRequestService.getFriendsSuggestionsForUser(user).get(),HttpStatus.OK);
+    }
+
 }
