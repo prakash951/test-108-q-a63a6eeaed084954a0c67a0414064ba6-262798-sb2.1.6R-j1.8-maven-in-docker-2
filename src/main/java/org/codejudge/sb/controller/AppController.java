@@ -11,6 +11,7 @@ import org.codejudge.sb.dto.ErrorUserResponse;
 import org.codejudge.sb.dto.IUserResponse;
 import org.codejudge.sb.dto.UserRequest;
 import org.codejudge.sb.service.FriendRequestService;
+import org.codejudge.sb.service.SuggestionService;
 import org.codejudge.sb.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,9 @@ public class AppController {
 
     @Autowired
     FriendRequestService myFriendRequestService;
+
+    @Autowired
+    SuggestionService mySuggestionService;
 
     @ApiOperation("This is the hello world api")
     @GetMapping("/")
@@ -79,7 +83,7 @@ public class AppController {
     @ApiOperation("This is the hello world api")
     @GetMapping("/suggestions/{user}")
     public ResponseEntity<?> getFriendSuggestions(@PathVariable(name="user") String user) {
-        return new ResponseEntity<>(myFriendRequestService.getFriendsSuggestionsForUser(user).get(),HttpStatus.OK);
+        return new ResponseEntity<>(mySuggestionService.getFriendsSuggestionsForUser(user).get(),HttpStatus.OK);
     }
 
 }
