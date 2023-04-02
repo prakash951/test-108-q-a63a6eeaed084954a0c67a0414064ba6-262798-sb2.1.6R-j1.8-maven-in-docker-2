@@ -33,40 +33,37 @@ public class SuggestionService {
     int maxLevel = 4;
 
     public Optional<SuggestionResponse> getFriendsSuggestionsForUser(String user) {
-        HashMap<Integer, HashSet<Long>> map = new HashMap<>();
+        HashMap<Integer, Set<Long>> map = new HashMap<>();
         List<User> users = myUserRepository.findByUsername(user);
         if (users == null || users.size() == 0) {
             throw new UserNotFoundException("User doesn't exists");
         }
         Long uid = users.get(0).getId();
         List<Friend> requests = myFriendRepository.findByUserid(uid);
-        log.info("Response for user: " + user + "  friends: " + requests);
         if (requests == null || requests.size() == 0) {
             throw new NoFriendRequestsPendingException("No pending friend requests");
         }
-        List<Long> friends = new ArrayList<>();
+        Set<Long> friends = new HashSet<>();
         Set<Long> suggestions = new HashSet<>();
         requests.stream().forEach(request -> friends.add(request.getFirendid()));
         requests = myFriendRepository.findByFirendid(uid);
         if (requests != null) {
             requests.stream().forEach(request -> friends.add(request.getUserid()));
         }
-        map.put(1, new HashSet<>(friends));
+        map.put(1, friends);
         map.get(1).add(uid);
-        log.info("friends: " + friends);
         friends.stream().forEach(id -> suggestions.addAll(getSuggestions(id, 2,map)));
 
         if (suggestions.size() == 0) {
             throw new NoFriendRequestsPendingException("No pending friend requests");
         }
-        log.info("suggestions:" + suggestions);
         suggestions.removeAll(map.get(1));
         List<String> response = new ArrayList<>();
         myUserRepository.findAllById(suggestions).forEach(record -> response.add(record.getUsername()));
         return Optional.of(SuggestionResponse.builder().suggestions(response).build());
     }
 
-    private Set<Long> getSuggestions(Long uid, int level, HashMap<Integer, HashSet<Long>> map) {
+    private Set<Long> getSuggestions(Long uid, int level, HashMap<Integer, Set<Long>> map) {
         if (level == maxLevel)
             return new HashSet<>();
         List<Friend> requests = myFriendRepository.findByUserid(uid);
@@ -74,16 +71,14 @@ public class SuggestionService {
         if (requests == null || requests.size() == 0) {
             return new HashSet<>();
         }
-        List<Long> friends = new ArrayList<>();
-        List<Long> ids = requests.stream().map(request -> {
+        Set<Long> friends = new HashSet<>();
+        Set<Long> ids = requests.stream().map(request -> {
             friends.add(request.getFirendid());
             return request.getFirendid();
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toSet());
         ids.stream().forEach(x -> friends.addAll(getSuggestions(x, level + 1, map)));
-
-        log.info("Friends for user: " + uid + " at level:" + level + " : " + friends);
-        map.put(level, new HashSet<>(friends));
-        return new HashSet<>(friends);
+        map.put(level, friends);
+        return friends;
     }
 
 }
