@@ -24,7 +24,7 @@ public class UserService {
     {
         log.info("Inside create user");
         List<User> users = mRepository.findByUsername(myRequest.getUsername());
-        if(users!=null && users.size()>0)
+        if(users!=null && !users.isEmpty())
         {
             log.info("User Exists");
             return Optional.empty();

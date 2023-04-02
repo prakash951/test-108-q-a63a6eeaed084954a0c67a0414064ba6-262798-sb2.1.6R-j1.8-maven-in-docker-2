@@ -50,13 +50,13 @@ public class FriendRequestService {
         Long myId1 = users.get(0).getUsername().equals(uid1) ? users.get(0).getId() : users.get(1).getId();
         Long myId2 = users.get(0).getUsername().equals(uid2) ? users.get(0).getId() : users.get(1).getId();
         List<FriendRequest> requests = myFriendRequestRepository.findByRequestorAndReceiver(myId1, myId2);
-        if (requests != null && requests.size() > 0) {
+        if (requests != null && !requests.isEmpty()) {
             return Optional.empty();
         }
         FriendRequest request = FriendRequest.builder().requestor(myId1).receiver(myId2).completed(false).build();
         myFriendRequestRepository.save(request);
         List<FriendRequest> requests1 = myFriendRequestRepository.findByRequestorAndReceiver(myId2, myId1);
-        if (requests1 != null && requests1.size() > 0) {
+        if (requests1 != null && !requests1.isEmpty()) {
             requests1.get(0).setCompleted(true);
             myFriendRequestRepository.save(requests1.get(0));
             request.setCompleted(true);
@@ -77,12 +77,12 @@ public class FriendRequestService {
 
     private List<String> getFriends(String user) {
         List<User> users = myUserRepository.findByUsername(user);
-        if (users == null || users.size() == 0) {
+        if (users == null || users.isEmpty()) {
             throw new UserNotFoundException("User doesn't exists");
         }
         Long uid = users.get(0).getId();
         List<Friend> requests = myFriendRepository.findByUserid(uid);
-        if (requests == null || requests.size() == 0) {
+        if (requests == null || requests.isEmpty()) {
             throw new NoFriendRequestsPendingException("No pending friend requests");
         }
         List<Long> ids = requests.stream().map(request -> request.getFirendid()).collect(Collectors.toList());
@@ -97,12 +97,12 @@ public class FriendRequestService {
 
     public Optional<FriendRequestsResponse> getFriendRequestForUser(String user) {
         List<User> users = myUserRepository.findByUsername(user);
-        if (users == null || users.size() == 0) {
+        if (users == null || users.isEmpty()) {
             throw new UserNotFoundException("User doesn't exists");
         }
         Long uid = users.get(0).getId();
         List<FriendRequest> requests = myFriendRequestRepository.findByReceiverAndCompleted(uid, false);
-        if (requests == null || requests.size() == 0) {
+        if (requests == null || requests.isEmpty()) {
             throw new NoFriendRequestsPendingException("No pending friend requests");
         }
         List<Long> ids = requests.stream().map(request -> request.getRequestor()).collect(Collectors.toList());

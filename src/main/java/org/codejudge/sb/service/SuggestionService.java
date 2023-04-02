@@ -35,12 +35,12 @@ public class SuggestionService {
     public Optional<SuggestionResponse> getFriendsSuggestionsForUser(String user) {
         HashMap<Integer, Set<Long>> map = new HashMap<>();
         List<User> users = myUserRepository.findByUsername(user);
-        if (users == null || users.size() == 0) {
+        if (users == null || users.isEmpty()) {
             throw new UserNotFoundException("User doesn't exists");
         }
         Long uid = users.get(0).getId();
         List<Friend> requests = myFriendRepository.findByUserid(uid);
-        if (requests == null || requests.size() == 0) {
+        if (requests == null || requests.isEmpty()) {
             throw new NoFriendRequestsPendingException("No pending friend requests");
         }
         Set<Long> friends = new HashSet<>();
@@ -54,7 +54,7 @@ public class SuggestionService {
         map.get(1).add(uid);
         friends.stream().forEach(id -> suggestions.addAll(getSuggestions(id, 2,map)));
 
-        if (suggestions.size() == 0) {
+        if (suggestions.isEmpty()) {
             throw new NoFriendRequestsPendingException("No pending friend requests");
         }
         suggestions.removeAll(map.get(1));
@@ -68,7 +68,7 @@ public class SuggestionService {
             return new HashSet<>();
         List<Friend> requests = myFriendRepository.findByUserid(uid);
         log.info("Response for user: " + uid + " at level:" + level + " friends: " + requests);
-        if (requests == null || requests.size() == 0) {
+        if (requests == null || requests.isEmpty()) {
             return new HashSet<>();
         }
         Set<Long> friends = new HashSet<>();
